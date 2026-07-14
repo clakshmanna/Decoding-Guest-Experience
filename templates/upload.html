@@ -1,0 +1,30 @@
+{% extends 'home.html' %}
+{% load static %}
+
+{% block title %}Upload Dataset{% endblock %}
+
+{% block content %}
+<div class="card mx-auto" style="max-width: 600px; padding: 25px; box-shadow: 0 0 10px #ddd;">
+    <h3 class="text-center mb-3">Upload Review Dataset</h3>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <label class="mb-1">Select CSV File</label>
+        <input type="file" name="csv_file" class="form-control" required>
+
+        <div class="mt-3 d-flex gap-2 justify-content-center">
+            <button class="btn btn-primary" type="submit">Upload</button>
+            <a href="{% url 'home' %}" class="btn btn-secondary">Back</a>
+        </div>
+
+        {% if messages %}
+            <div class="mt-3">
+                {% for message in messages %}
+                    <div class="alert alert-info">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}

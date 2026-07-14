@@ -1,0 +1,191 @@
+{% extends "home.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+    body {
+        background: ;
+    }
+
+    /* WHITE MAIN TITLE */
+    .dashboard-title {
+        font-size: 32px;
+        font-weight: 800;
+        color: #ffffff;
+        text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+    }
+
+    .card-custom {
+        border-radius: 20px;
+        transition: 0.3s ease-in-out;
+    }
+
+    .card-custom:hover {
+        transform: translateY(-5px);
+    }
+
+    .happy-card {
+        background: linear-gradient(135deg, #00c853, #64dd17);
+        color: white;
+    }
+
+    .notsat-card {
+        background: linear-gradient(135deg, #d50000, #ff1744);
+        color: white;
+    }
+
+    .neutral-card {
+        background: linear-gradient(135deg, #455a64, #90a4ae);
+        color: white;
+    }
+
+    .table thead {
+        background: linear-gradient(90deg, #1e3c72, #2a5298);
+        color: white;
+    }
+
+    .btn-custom {
+        background: linear-gradient(90deg, #ff512f, #dd2476);
+        border: none;
+        color: white;
+        font-weight: 600;
+        border-radius: 30px;
+        padding: 8px 20px;
+        transition: 0.3s;
+    }
+
+    .btn-custom:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 15px rgba(221, 36, 118, 0.6);
+    }
+</style>
+
+<div class="container py-4">
+
+    <!-- Page Title -->
+    <div class="text-center mb-4">
+        <h2 class="dashboard-title">📊<font color="RED"> Sentiment Analysis Dashboard</font></h2>
+        <p class="text-muted fw-semibold">
+        <h4><font color="RED">    Dataset sentiment breakdown & aspect-wise insights  </font></h4>
+        </p>
+        <button class="btn btn-custom mt-2">Refresh Data</button>
+    </div>
+
+    <!-- Sentiment Cards -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-4">
+            <div class="card card-custom shadow-lg happy-card">
+                <div class="card-body text-center">
+                    <h5 class="fw-bold">😊 Happy</h5>
+                    <h1 class="fw-bold display-5">{{ happy }}</h1>
+                    <p class="fw-bold fs-5">{{ happy_percent|floatformat:2 }}%</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card card-custom shadow-lg notsat-card">
+                <div class="card-body text-center">
+                    <h5 class="fw-bold">😡 Not Satisfied</h5>
+                    <h1 class="fw-bold display-5">{{ not_satisfied }}</h1>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card card-custom shadow-lg neutral-card">
+                <div class="card-body text-center">
+                    <h5 class="fw-bold">😐 Neutral</h5>
+                    <h1 class="fw-bold display-5">{{ neutral }}</h1>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Donut Chart -->
+    <div class="card shadow-lg border-0 rounded-4 mb-5">
+        <div class="card-body">
+            <h4 class="fw-bold text-center mb-4" style="color:#2a5298;">
+                Sentiment Distribution Overview
+            </h4>
+            <canvas id="sentimentChart" height="100"></canvas>
+        </div>
+    </div>
+
+    <!-- Aspect Table -->
+    <div class="card shadow-lg border-0 rounded-4 mb-4">
+        <div class="card-body">
+            <h4 class="fw-bold mb-3 text-primary">
+                Aspect-wise Sentiment Overview
+            </h4>
+
+            <table class="table table-hover text-center align-middle">
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>😊 Happy</th>
+                        <th>😡 Not Satisfied</th>
+                        <th>😐 Neutral</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for aspect, data in aspect_summary.items %}
+                    <tr>
+                        <td class="fw-bold text-dark">{{ aspect|title }}</td>
+                        <td class="text-success fw-bold">{{ data.happy }}</td>
+                        <td class="text-danger fw-bold">{{ data.not_satisfied }}</td>
+                        <td class="text-secondary fw-bold">{{ data.neutral }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+var ctx = document.getElementById("sentimentChart").getContext("2d");
+
+new Chart(ctx, {
+    type: "doughnut",
+    data: {
+        labels: ["Happy", "Not Satisfied", "Neutral"],
+        datasets: [{
+            data: [{{ happy }}, {{ not_satisfied }}, {{ neutral }}],
+            backgroundColor: [
+                "#00e676",
+                "#ff1744",
+                "#607d8b"
+            ],
+            borderWidth: 5,
+            borderColor: "#ffffff",
+            hoverOffset: 15
+        }]
+    },
+    options: {
+        cutout: "65%",
+        responsive: true,
+        plugins: {
+            legend: {
+                position: "bottom",
+                labels: {
+                    font: {
+                        size: 14,
+                        weight: "bold"
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+
+{% endblock %}
